@@ -152,7 +152,8 @@ fun StoryboardScreen(navController: NavController) {
             }, modifier = Modifier
                 .padding(16.dp) // 设置外边距
                 .fillMaxWidth(), // 填充整个宽度
-            enabled = !generating // 根据生成状态控制按钮是否可用
+            enabled = !generating, // 根据生成状态控制按钮是否可用
+            shape = MaterialTheme.shapes.large
         ) {
             // 根据生成状态显示不同文本："正在生成..."或"生成视频"
             Text(if (generating) "正在生成..." else "生成视频")
@@ -170,7 +171,8 @@ fun StoryboardCard(scene: SceneItem, navController: NavController) {
     // 卡片组件 - 固定尺寸为200dp，使用阴影提升视觉层次感
     Card(
         modifier = Modifier.size(200.dp), // 设置固定大小
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp) // 设置默认阴影
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), // 设置默认阴影
+        shape = MaterialTheme.shapes.medium
     ) {
         // 卡片内部垂直布局
         Column(
@@ -229,6 +231,7 @@ fun StoryboardCard(scene: SceneItem, navController: NavController) {
                     .padding(start = 8.dp, top = 8.dp) // 左侧和顶部外边距
                     .fillMaxWidth() // 填充整个宽度
                     .height(40.dp), // 固定高度
+                shape = MaterialTheme.shapes.medium,
                 contentPadding = ButtonDefaults.ContentPadding // 使用默认内边距
             ) {
                 Text("详情") // 按钮文本

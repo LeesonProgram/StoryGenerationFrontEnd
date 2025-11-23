@@ -271,7 +271,10 @@ fun PreviewScreen(navController: NavController) {
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
             ) {
-                Button(onClick = { navController.popBackStack() }) {
+                Button(
+                    onClick = { navController.popBackStack() },
+                    shape = MaterialTheme.shapes.medium
+                ) {
                     Text("返回")
                 }
             }
@@ -320,7 +323,8 @@ fun PreviewScreen(navController: NavController) {
                 }, enabled = !isExporting, // 导出过程中禁用按钮
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
                 if (isExporting) {
                     // 导出过程中显示加载指示器

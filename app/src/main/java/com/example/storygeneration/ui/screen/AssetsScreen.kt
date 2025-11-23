@@ -53,7 +53,8 @@ fun AssetsScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            colors = TextFieldDefaults.colors()
+            colors = TextFieldDefaults.colors(),
+            shape = MaterialTheme.shapes.medium
         )
 
         // 使用LazyColumn实现单列列表
@@ -78,7 +79,9 @@ fun AssetCard(story: StoryAsset, navController: NavController) {
             .clickable {
                 // 点击卡片跳转到预览页（极简模式）
                 navController.navigate("preview")
-            })
+            },
+        shape = MaterialTheme.shapes.medium
+    )
     {
         Column(modifier = Modifier.padding(12.dp)) {
             // 图片占位区域
