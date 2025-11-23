@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -49,7 +50,8 @@ fun CreateScreen(navController: NavController) {
                 .padding(top = 16.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(0.5f),
-            singleLine = false
+            singleLine = false,
+            shape = MaterialTheme.shapes.medium
         )
 
         // 水平排列的样式选择按钮
@@ -57,10 +59,12 @@ fun CreateScreen(navController: NavController) {
             modifier = Modifier
                 .padding(top = 16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             listOf(Style.Movie, Style.Animation, Style.Realistic).forEach { styleOption ->
                 Button(
+                    modifier = Modifier
+                        .weight(1f),
                     onClick = { setStyle(styleOption) },
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(
@@ -79,8 +83,8 @@ fun CreateScreen(navController: NavController) {
                             MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
                         },
                         modifier = Modifier.padding(8.dp),
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        maxLines = 2,
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -93,7 +97,8 @@ fun CreateScreen(navController: NavController) {
             modifier = Modifier
                 .padding(top = 24.dp)
                 .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            shape = MaterialTheme.shapes.medium
         ) {
             Text("Generate Storyboard", style = MaterialTheme.typography.bodyLarge)
         }

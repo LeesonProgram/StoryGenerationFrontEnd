@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -108,14 +107,14 @@ fun ShotDetailScreen(navController: NavController) {
                 .padding(top = 16.dp) // 上方间距
                 .fillMaxWidth() // 占满宽度
                 .height(200.dp) // 固定高度200dp
-                .clip(RoundedCornerShape(8.dp)) // 圆角矩形裁剪
+                .clip(MaterialTheme.shapes.large) // 统一使用主题圆角
                 .background(Color(0xFF4CAF50)) // 绿色背景占位
         ) {
             // 状态标签 - 在图像区域右上角显示当前生成状态
             Box(
                 modifier = Modifier
                     .padding(8.dp) // 外边距
-                    .background(statusColor, shape = RoundedCornerShape(4.dp)) // 使用状态对应的颜色作为背景
+                    .background(statusColor, shape = MaterialTheme.shapes.extraSmall) // 使用状态对应的颜色作为背景
                     .padding(horizontal = 12.dp, vertical = 4.dp) // 内边距
             ) {
                 Text(
@@ -133,7 +132,8 @@ fun ShotDetailScreen(navController: NavController) {
             label = { Text("分镜描述") }, // 输入框标签
             modifier = Modifier
                 .padding(top = 16.dp) // 上方间距
-                .fillMaxWidth() // 占满宽度
+                .fillMaxWidth(), // 占满宽度
+            shape = MaterialTheme.shapes.medium
         )
 
         // 视频过渡效果下拉选择器 - 用于选择场景间的过渡动画效果
@@ -152,7 +152,9 @@ fun ShotDetailScreen(navController: NavController) {
                         imageVector = androidx.compose.material.icons.Icons.Default.ArrowDropDown, // 下拉箭头图标
                         contentDescription = "下拉箭头", // 无障碍访问描述
                         modifier = Modifier.clickable { setDropdownExpanded(!dropdownExpanded) }) // 点击切换菜单展开状态
-                })
+                },
+                shape = MaterialTheme.shapes.medium
+            )
 
             // 下拉菜单 - 包含所有可用的过渡效果选项
             DropdownMenu(
@@ -179,7 +181,8 @@ fun ShotDetailScreen(navController: NavController) {
             label = { Text("旁白文本") }, // 输入框标签
             modifier = Modifier
                 .padding(top = 16.dp) // 上方间距
-                .fillMaxWidth() // 占满宽度
+                .fillMaxWidth(), // 占满宽度
+            shape = MaterialTheme.shapes.medium
         )
 
         // 生成图像按钮 - 点击触发图像生成流程
@@ -193,7 +196,8 @@ fun ShotDetailScreen(navController: NavController) {
                 }
             }, modifier = Modifier
                 .padding(top = 16.dp) // 上方间距
-                .fillMaxWidth() // 占满宽度
+                .fillMaxWidth(), // 占满宽度
+            shape = MaterialTheme.shapes.medium
         ) {
             Text("生成图像") // 按钮文本
         }

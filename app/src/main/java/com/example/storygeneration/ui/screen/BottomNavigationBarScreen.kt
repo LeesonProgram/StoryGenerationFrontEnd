@@ -2,6 +2,7 @@ package com.example.storygeneration.ui.screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -10,11 +11,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,8 +24,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
@@ -62,7 +64,11 @@ fun BottomNavigationBarScreen(navController: NavController) {
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                modifier = Modifier
+                    .height(56.dp)
+                    .clip(MaterialTheme.shapes.large)
+            ) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.title) },
@@ -77,17 +83,8 @@ fun BottomNavigationBarScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            TabRow(selectedTabIndex = selectedItem) {
-                items.forEachIndexed { index, item ->
-                    Tab(
-                        selected = selectedItem == index,
-                        onClick = { onBottomNavItemClicked(index) },
-                        text = { Text(item.title) })
-                }
-            }
-
             HorizontalPager(
-                state = pagerState, modifier = Modifier.weight(1f)
+                state = pagerState, modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
                     0 -> CreateScreen(navController)
