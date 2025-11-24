@@ -8,11 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.storygeneration.ui.screen.AssetsScreen
+import com.example.storygeneration.ui.screen.BottomNavigationBarScreen
 import com.example.storygeneration.ui.screen.CreateScreen
 import com.example.storygeneration.ui.screen.PreviewScreen
 import com.example.storygeneration.ui.screen.ShotDetailScreen
 import com.example.storygeneration.ui.screen.StoryboardScreen
-import com.example.storygeneration.ui.screen.BottomNavigationBarScreen
 import com.example.storygeneration.ui.theme.StoryGenerationTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +26,12 @@ class MainActivity : ComponentActivity() {
                     composable("home") { BottomNavigationBarScreen(navController) }
                     composable("create") { CreateScreen(navController) }
                     composable("storyboard") { StoryboardScreen(navController) }
-                    composable("shotDetail") { ShotDetailScreen(navController) }
+                    composable("shotDetail/{shotId}") { backStackEntry ->
+                        ShotDetailScreen(
+                            navController,
+                            backStackEntry.arguments?.getString("shotId")
+                        )
+                    }
                     composable("assets") { AssetsScreen(navController) }
                     composable("preview") { PreviewScreen(navController) }
                 }

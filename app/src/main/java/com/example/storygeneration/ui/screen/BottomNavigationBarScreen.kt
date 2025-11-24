@@ -37,7 +37,6 @@ fun BottomNavigationBarScreen(navController: NavController) {
     val pagerState = rememberPagerState(initialPage = selectedItem) { 2 }
     val coroutineScope = rememberCoroutineScope()
 
-    // 监听页面变化并更新选中的底部导航项
     remember(pagerState) {
         coroutineScope.launch {
             snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -46,7 +45,6 @@ fun BottomNavigationBarScreen(navController: NavController) {
         }
     }
 
-    // 当底部导航项被点击时，切换到相应的页面
     fun onBottomNavItemClicked(index: Int) {
         selectedItem = index
         coroutineScope.launch {
@@ -54,7 +52,6 @@ fun BottomNavigationBarScreen(navController: NavController) {
         }
     }
 
-    // 定义底部导航项
     val items = listOf(
         BottomNavItem("Create", Icons.Default.Add),
         BottomNavItem("Assets", Icons.Default.Collections)
@@ -68,10 +65,12 @@ fun BottomNavigationBarScreen(navController: NavController) {
                         icon = { Icon(item.icon, contentDescription = item.title) },
                         label = { Text(item.title) },
                         selected = selectedItem == index,
-                        onClick = { onBottomNavItemClicked(index) })
+                        onClick = { onBottomNavItemClicked(index) }
+                    )
                 }
             }
-        }) { innerPadding ->
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -82,12 +81,14 @@ fun BottomNavigationBarScreen(navController: NavController) {
                     Tab(
                         selected = selectedItem == index,
                         onClick = { onBottomNavItemClicked(index) },
-                        text = { Text(item.title) })
+                        text = { Text(item.title) }
+                    )
                 }
             }
 
             HorizontalPager(
-                state = pagerState, modifier = Modifier.weight(1f)
+                state = pagerState,
+                modifier = Modifier.weight(1f)
             ) { page ->
                 when (page) {
                     0 -> CreateScreen(navController)

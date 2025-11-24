@@ -5,9 +5,9 @@ data class Shot(
     val prompt: String,
     val narration: String,
     val imageUrl: String,
-    val transition: Transition = Transition.CROSSFADE
+    val transition: Transition = Transition.Crossfade
 )
 
 enum class Transition {
-    KEN_BURNS, CROSSFADE, VOLUME_MIX
+    Ken_Burns, Crossfade, Volume_Mix
 }

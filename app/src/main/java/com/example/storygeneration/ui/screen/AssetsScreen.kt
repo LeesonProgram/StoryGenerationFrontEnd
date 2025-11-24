@@ -27,7 +27,6 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun AssetsScreen(navController: NavController) {
     val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
-    // 更新模拟数据以匹配UI参考图
     val mockStories = listOf(
         StoryAsset("1", "Camping Adventure", "Apr 21, 2024", "camping.jpg"),
         StoryAsset("2", "Sunset at the Summit", "Apr 21, 2024", "sunset.jpg")
@@ -38,14 +37,12 @@ fun AssetsScreen(navController: NavController) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // 顶部标题
         Text(
             "StoryFlow",
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // 搜索框
         OutlinedTextField(
             value = searchQuery,
             onValueChange = setSearchQuery,
@@ -56,7 +53,6 @@ fun AssetsScreen(navController: NavController) {
             colors = TextFieldDefaults.colors()
         )
 
-        // 使用LazyColumn实现单列列表
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,12 +72,10 @@ fun AssetCard(story: StoryAsset, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                // 点击卡片跳转到预览页（极简模式）
                 navController.navigate("preview")
-            })
-    {
+            }
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            // 图片占位区域
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -89,11 +83,9 @@ fun AssetCard(story: StoryAsset, navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 这里应该是实际的图片，使用占位符代替
                 Text("Image Placeholder")
             }
 
-            // 标题和时间
             Text(
                 story.title,
                 style = MaterialTheme.typography.titleMedium,
@@ -110,16 +102,12 @@ fun AssetCard(story: StoryAsset, navController: NavController) {
 }
 
 data class StoryAsset(
-    val id: String,
-    val title: String,
-    val time: String,
-    val imageUrl: String
+    val id: String, val title: String, val time: String, val imageUrl: String
 )
 
 @Preview(showBackground = true)
 @Composable
 fun AssetsScreenPreview() {
-    // 在预览中我们不需要实际的导航控制器
     val navController = rememberNavController()
     AssetsScreen(navController = navController)
 }

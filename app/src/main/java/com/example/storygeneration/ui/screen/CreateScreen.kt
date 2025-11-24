@@ -2,6 +2,7 @@ package com.example.storygeneration.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -28,38 +30,38 @@ fun CreateScreen(navController: NavController) {
     val (title, setTitle) = remember { mutableStateOf("") }
     val (content, setContent) = remember { mutableStateOf("") }
     val (style, setStyle) = remember { mutableStateOf<Style>(Style.Movie) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // 标题
         Text(
             "Create",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // 内容输入框
         OutlinedTextField(
             value = content,
             onValueChange = setContent,
             placeholder = { Text("Write your story...") },
             modifier = Modifier
-                .padding(top = 16.dp)
+                .padding(bottom = 16.dp)
                 .fillMaxWidth()
-                .fillMaxHeight(0.5f),
+                .fillMaxHeight(0.3f),
             singleLine = false
         )
 
-        // 水平排列的样式选择按钮
         Row(
             modifier = Modifier
-                .padding(top = 16.dp)
+                .padding(bottom = 16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            listOf(Style.Movie, Style.Animation, Style.Realistic).forEach { styleOption ->
+            val styleOptions = listOf(Style.Movie, Style.Animation, Style.Realistic)
+            styleOptions.forEach { styleOption ->
                 Button(
                     onClick = { setStyle(styleOption) },
                     shape = MaterialTheme.shapes.medium,
@@ -69,7 +71,9 @@ fun CreateScreen(navController: NavController) {
                         } else {
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                         }
-                    )
+                    ),
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
                         styleOption.name,
@@ -78,16 +82,13 @@ fun CreateScreen(navController: NavController) {
                         } else {
                             MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
                         },
-                        modifier = Modifier.padding(8.dp),
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        softWrap = false
                     )
                 }
             }
         }
 
-        // 生成故事板按钮
         Button(
             onClick = { navController.navigate("storyboard") },
             modifier = Modifier
@@ -98,14 +99,16 @@ fun CreateScreen(navController: NavController) {
             Text("Generate Storyboard", style = MaterialTheme.typography.bodyLarge)
         }
 
-        // 底部提示文本
         Text(
             "The storyboard will open automatically after generation.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            textAlign = TextAlign.Center,
+            softWrap = true
         )
     }
 }
