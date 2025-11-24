@@ -92,7 +92,7 @@ fun CreateScreen(navController: NavController) {
         Button(
             onClick = { navController.navigate("storyboard") },
             modifier = Modifier
-                .padding(top = 24.dp)
+                .padding(bottom = 20.dp)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
@@ -104,7 +104,7 @@ fun CreateScreen(navController: NavController) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
-                .padding(top = 8.dp)
+                .padding(bottom = 8.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             textAlign = TextAlign.Center,
