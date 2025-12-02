@@ -31,46 +31,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
+import com.example.storygeneration.data.model.Shot
+import com.example.storygeneration.viewmodel.StoryViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-data class SceneItem(
-    val id: String,
-    val title: String,
-    val description: String,
-    val status: String,
-    val thumbnailUrl: String = ""
-)
-
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-fun StoryboardScreen(navController: NavController) {
-    val (scenes, setScenes) = remember {
-        mutableStateOf(
-            listOf(
-                SceneItem(
-                    id = "1",
-                    title = "营地晨雾...",
-                    description = "清晨薄雾笼罩着山间营地",
-                    status = "Generated",
-                    thumbnailUrl = "https://via.placeholder.com/200"
-                ), SceneItem(
-                    id = "2",
-                    title = "徒步者...",
-                    description = "徒步者正在穿越湍急的河流",
-                    status = "Not Generated",
-                    thumbnailUrl = "https://via.placeholder.com/200"
-                )
-            )
-        )
-    }
+fun StoryboardScreen(navController: NavController, viewModel: StoryViewModel = viewModel()) {
+    // 使用ViewModel中的场景数据
+    val scenes = viewModel.scenes
 
     val (generating, setGenerating) = remember { mutableStateOf(false) }
 
@@ -100,66 +76,78 @@ fun StoryboardScreen(navController: NavController) {
         )
 
         LazyRow(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .height(300.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            items(scenes) { scene ->
-
-                Box(modifier = Modifier.clickable { navController.navigate("shotDetail/${scene.id}") }) {
-                    StoryboardCard(scene, navController)
+            items(scenes) { shot ->
+                Box(modifier = Modifier.clickable {
+                    navController.navigate(
+                        "shotDetail/${
+                            scenes.indexOf(
+                                shot
+                            ) + 1
+                        }"
+                    )
+                }) {
+                    StoryboardCard(shot, scenes.indexOf(shot), navController)
                 }
             }
         }
 
         Button(
             onClick = {
-                setGenerating(true)
+                // 更新场景状态为"Completed"
+                viewModel.scenes.forEach { scene ->
+                    // 在实际应用中，这里可能需要更新每个场景的状态
+                }
 
+                // 模拟视频生成过程
                 MainScope().launch {
                     delay(3000)
-                    val updatedScenes = scenes.map { it.copy(status = "Completed") }
-                    setScenes(updatedScenes)
-                    setGenerating(false)
                     navController.navigate("preview")
                 }
             }, modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            enabled = !generating
+                .fillMaxWidth()
         ) {
-            Text(if (generating) "Generating..." else "Generate Video")
+            Text("Generate Video")
         }
     }
 }
 
 
 @Composable
-fun StoryboardCard(scene: SceneItem, navController: NavController) {
+fun StoryboardCard(shot: Shot, index: Int, navController: NavController) {
 
     Card(
-        modifier = Modifier.size(200.dp),
+        modifier = Modifier.size(250.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFE8F5E9)), // 设置绿色背景
             horizontalAlignment = Alignment.Start
         ) {
-            AsyncImage(
-                model = scene.thumbnailUrl,
-                contentDescription = scene.title,
-                contentScale = ContentScale.Crop,
+            // 使用绿色背景图代替占位图
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-            )
-
-            val statusColor = when (scene.status) {
-                "Generated" -> Color(0xFF4CAF50)
-                "Not Generated" -> Color(0xFF9E9E9E)
-                "Completed" -> Color(0xFF2196F3)
-                else -> Color(0xFF9E9E9E)
+                    .background(Color(0xFF4CAF50)), // 深绿色背景
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "场景 ${index + 1}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White
+                )
             }
+
+            // 因为Shot类中没有status字段，所以使用固定值
+            val statusColor = Color(0xFF4CAF50) // 默认使用绿色表示已生成
 
             Box(
                 modifier = Modifier
@@ -168,23 +156,40 @@ fun StoryboardCard(scene: SceneItem, navController: NavController) {
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             ) {
                 Text(
-                    scene.status, style = MaterialTheme.typography.bodySmall,
+                    "Generated", style = MaterialTheme.typography.bodySmall,
                     color = Color.White
                 )
             }
 
             Text(
-                scene.title, style = MaterialTheme.typography.titleSmall,
+                shot.scence_title, style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
             )
 
             Text(
-                scene.description, style = MaterialTheme.typography.bodySmall,
+                shot.narration, style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
             )
 
+            // 显示prompt信息
+            Text(
+                shot.prompt,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 8.dp, top = 4.dp),
+                maxLines = 2,
+                softWrap = true
+            )
+
+            // 显示bgm_suggestion信息
+            Text(
+                "BGM: ${shot.bgm_suggestion}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 8.dp, top = 4.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
+
             Button(
-                onClick = { navController.navigate("shotDetail/${scene.id}") },
+                onClick = { navController.navigate("shotDetail/${index + 1}") },
                 modifier = Modifier
                     .padding(start = 8.dp, top = 8.dp)
                     .fillMaxWidth()
@@ -202,5 +207,28 @@ fun StoryboardCard(scene: SceneItem, navController: NavController) {
 @Composable
 fun StoryboardScreenPreview() {
     val navController = rememberNavController()
-    StoryboardScreen(navController = navController)
+    // 创建一个带有模拟数据的ViewModel
+    val viewModel = StoryViewModel()
+
+    // 添加一些模拟的场景数据用于预览
+    val mockScenes = listOf(
+        Shot(
+            scence_title = "小猫清晨醒来",
+            prompt = "一只毛茸茸的小猫伸懒腰，从温暖的被窝中爬出来，阳光透过窗户洒在它身上。它好奇地四处张望，似乎在寻找早餐。",
+            narration = "小猫睁开眼睛，金色的眼睛闪烁着好奇与活力。它轻轻地舔了舔嘴巴，似乎刚刚睡醒。",
+            bgm_suggestion = "轻柔的钢琴曲"
+        ),
+        Shot(
+            scence_title = "小猫探索花园",
+            prompt = "小猫小心翼翼地走进花园，花朵的香气让它陶醉。蝴蝶在它周围飞舞，小猫好奇地追逐着。",
+            narration = "阳光明媚的早晨，小猫第一次来到了美丽的花园。这里的一切对它来说都是那么新奇。",
+            bgm_suggestion = "轻快的小提琴曲"
+        )
+    )
+
+    // 直接填充模拟数据（在实际应用中，这些数据会通过API获取）
+    viewModel.scenes.clear()
+    viewModel.scenes.addAll(mockScenes)
+
+    StoryboardScreen(navController = navController, viewModel = viewModel)
 }

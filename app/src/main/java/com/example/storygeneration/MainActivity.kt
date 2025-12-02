@@ -13,6 +13,7 @@ import com.example.storygeneration.ui.screen.CreateScreen
 import com.example.storygeneration.ui.screen.PreviewScreen
 import com.example.storygeneration.ui.screen.ShotDetailScreen
 import com.example.storygeneration.ui.screen.StoryboardScreen
+import com.example.storygeneration.viewmodel.StoryViewModel
 import com.example.storygeneration.ui.theme.StoryGenerationTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,8 +25,14 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") { BottomNavigationBarScreen(navController) }
-                    composable("create") { CreateScreen(navController) }
-                    composable("storyboard") { StoryboardScreen(navController) }
+                    composable("create") { 
+                        val viewModel = StoryViewModel()
+                        CreateScreen(navController, viewModel) 
+                    }
+                    composable("storyboard") { 
+                        val viewModel = StoryViewModel()
+                        StoryboardScreen(navController, viewModel) 
+                    }
                     composable("shotDetail/{shotId}") { backStackEntry ->
                         ShotDetailScreen(
                             navController,

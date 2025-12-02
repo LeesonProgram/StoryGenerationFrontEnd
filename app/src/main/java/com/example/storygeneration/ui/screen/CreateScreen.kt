@@ -1,5 +1,6 @@
 package com.example.storygeneration.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,12 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.storygeneration.data.model.Shot
 import com.example.storygeneration.data.model.Style
+import com.example.storygeneration.viewmodel.StoryViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 @Composable
-fun CreateScreen(navController: NavController) {
+fun CreateScreen(navController: NavController, viewModel: StoryViewModel = viewModel()) {
     val (title, setTitle) = remember { mutableStateOf("") }
     val (content, setContent) = remember { mutableStateOf("") }
     val (style, setStyle) = remember { mutableStateOf<Style>(Style.Movie) }
@@ -90,13 +103,98 @@ fun CreateScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("storyboard") },
+            onClick = {
+                // 使用 OkHttp 发送 POST 请求到后端，携带 JSON 请求体 { prompt, style }
+                viewModel.isLoading.value = true
+
+                MainScope().launch {
+                    try {
+                        val client = OkHttpClient()
+
+                        val jsonBody = JSONObject().apply {
+                            put("prompt", content)
+                            put("style", style.name)
+                        }.toString()
+
+                        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+                        val body = jsonBody.toRequestBody(mediaType)
+
+                        val request = Request.Builder()
+                            .url("http://120.26.74.235/api/story/generate")
+                            .post(body)
+                            .build()
+
+                        val response = withContext(Dispatchers.IO) {
+                            client.newCall(request).execute()
+                        }
+
+                        if (response.isSuccessful) {
+                            val respStr = response.body?.string()
+                            if (!respStr.isNullOrEmpty()) {
+                                val jo = JSONObject(respStr)
+                                val code = jo.optInt("code", -1)
+                                if (code == 200) {
+                                    val data = jo.optJSONObject("data")
+                                    val shotList = mutableListOf<Shot>()
+                                    if (data != null) {
+                                        val arr = data.optJSONArray("shotList")
+                                        if (arr != null) {
+                                            for (i in 0 until arr.length()) {
+                                                val item = arr.optJSONObject(i)
+                                                if (item != null) {
+                                                    val shot = Shot(
+                                                        scence_title = item.optString("scence_title"),
+                                                        prompt = item.optString("prompt"),
+                                                        narration = item.optString("narration"),
+                                                        bgm_suggestion = item.optString("bgm_suggestion")
+                                                    )
+                                                    shotList.add(shot)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // 更新 ViewModel 的场景数据（在主线程）
+                                    withContext(Dispatchers.Main) {
+                                        viewModel.scenes.clear()
+                                        viewModel.scenes.addAll(shotList)
+                                        viewModel.isLoading.value = false
+                                        navController.navigate("storyboard")
+                                    }
+                                } else {
+                                    Log.e("CreateScreen", "server returned code=$code")
+                                    withContext(Dispatchers.Main) {
+                                        viewModel.isLoading.value = false
+                                    }
+                                }
+                            } else {
+                                Log.e("CreateScreen", "empty response body")
+                                withContext(Dispatchers.Main) {
+                                    viewModel.isLoading.value = false
+                                }
+                            }
+                        } else {
+                            Log.e("CreateScreen", "request failed: ${response.code}")
+                            withContext(Dispatchers.Main) {
+                                viewModel.isLoading.value = false
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("CreateScreen", "network error", e)
+                        viewModel.isLoading.value = false
+                    }
+                }
+            },
+            enabled = !viewModel.isLoading.value,
             modifier = Modifier
                 .padding(bottom = 20.dp)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Text("Generate Storyboard", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                if (viewModel.isLoading.value) "Generating..." else "Generate Storyboard",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
 
         Text(
@@ -117,5 +215,6 @@ fun CreateScreen(navController: NavController) {
 @Composable
 fun CreateScreenPreview() {
     val navController = rememberNavController()
-    CreateScreen(navController = navController)
+    val viewModel = StoryViewModel()
+    CreateScreen(navController = navController, viewModel = viewModel)
 }
